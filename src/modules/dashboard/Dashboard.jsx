@@ -26,14 +26,6 @@ const TRIP_ICONS = {
   default:   '✈️',
 }
 
-// ── Modules accès rapide ──────────────────────────────────
-const QUICK_MODULES = [
-  { icon: '✈️', label: 'Voyages',   path: '/voyages',    color: '#d97c1a' },
-  { icon: '🔗', label: 'Liens',     path: '/liens',      color: '#3b82f6' },
-  { icon: '📦', label: 'Archives',  path: '/archives',   color: '#8b5cf6' },
-  { icon: '⚙️', label: 'Réglages',  path: '/parametres', color: '#6b7280' },
-]
-
 // ── Compte à rebours ───────────────────────────────────────
 const Countdown = ({ days }) => {
   if (days === null) return null
@@ -266,36 +258,6 @@ const Dashboard = () => {
           {otherTrips.map((t, i) => <TripCard key={t.id} trip={t} navigate={navigate} delay={i * 80} />)}
         </section>
       )}
-
-      {/* ── Accès rapide ── */}
-      <section style={{ marginBottom:'1.5rem' }}>
-        <p style={{ fontSize:'.8rem', fontWeight:700, textTransform:'uppercase', letterSpacing:'.08em', color:'var(--color-text-muted)', margin:'0 0 .7rem' }}>
-          ⚡ Accès rapide
-        </p>
-        <div style={{ display:'grid', gridTemplateColumns:'repeat(4, 1fr)', gap:'.6rem' }}>
-          {QUICK_MODULES.map(({ icon, label, path, color }, i) => (
-            <button
-              key={path}
-              onClick={() => navigate(path)}
-              style={{
-                display:'flex', flexDirection:'column', alignItems:'center', gap:'.4rem',
-                padding:'.8rem .4rem',
-                background:'var(--color-bg-card)', border:'1px solid var(--color-border)',
-                borderRadius:14, cursor:'pointer',
-                animation: `fadeUp .4s ${i * 60}ms ease both`,
-                transition:'transform .15s, border-color .2s',
-              }}
-              onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.borderColor = 'var(--color-primary)' }}
-              onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.borderColor = 'var(--color-border)' }}
-            >
-              <div style={{ width:42, height:42, borderRadius:12, display:'flex', alignItems:'center', justifyContent:'center', fontSize:'1.3rem', background:`${color}22`, color }}>
-                {icon}
-              </div>
-              <span style={{ fontSize:'.68rem', fontWeight:600, color:'var(--color-text-muted)', textAlign:'center' }}>{label}</span>
-            </button>
-          ))}
-        </div>
-      </section>
     </div>
   )
 }
