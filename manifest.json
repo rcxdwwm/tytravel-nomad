@@ -1,18 +1,29 @@
 {
-  "name": "Life Manager",
-  "short_name": "Life Manager",
-  "description": "Gestionnaire de vie personnelle",
-  "start_url": "/lifeManager-tywebcreation/",
-  "scope": "/lifeManager-tywebcreation/",
+  "name": "TyTravel Nomad",
+  "short_name": "TyTravel",
+  "description": "Organisez vos voyages facilement",
+  "start_url": "/tytravel-nomad/",
+  "scope": "/tytravel-nomad/",
   "display": "standalone",
-  "background_color": "#1a1a1a",
-  "theme_color": "#1a1a1a",
-  "orientation": "portrait-primary",
+  "background_color": "#0d0a07",
+  "theme_color": "#d97c1a",
+  "orientation": "portrait",
   "icons": [
     {
-      "src": "/lifeManager-tywebcreation/favicon.svg",
+      "src": "/tytravel-nomad/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/tytravel-nomad/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "/tytravel-nomad/favicon.svg",
       "sizes": "any",
       "type": "image/svg+xml"
     }
+
   ]
 }
