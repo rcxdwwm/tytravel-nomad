@@ -6,6 +6,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import useItinerary from './hooks/useItinerary'
 import useTrips from '../trips/hooks/useTrips'
 import { getDateRange, formatDate, formatDateMini, formatTime } from '../../utils/dateUtils'
+import { useApp } from '../../context/AppContext'
 
 // ── Types d'activités ────────────────────────────────────────
 const ACTIVITY_TYPES = [
@@ -231,7 +232,8 @@ const DayCard = ({ date, dayNum, activities, onAddActivity, onEditActivity, onDe
 const Itinerary = () => {
   const { id }    = useParams()
   const navigate  = useNavigate()
-  const { getTripById } = useTrips()
+  const { } = useTrips()
+  const { getTripById } = useApp()
   const { days, addActivity, updateActivity, deleteActivity, initDays } = useItinerary(id)
 
   const trip = getTripById(id)

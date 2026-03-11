@@ -120,7 +120,8 @@ const QuickStat = ({ icon, value, label }) => (
 const TripDetail = () => {
   const { id }     = useParams()
   const navigate   = useNavigate()
-  const { deleteTrip, getTripById } = useTrips()
+  const { deleteTrip } = useTrips()
+  const { getTripById } = useApp()
   const { bookings, budgets, checklists } = useApp()
 
   const trip = getTripById(id)

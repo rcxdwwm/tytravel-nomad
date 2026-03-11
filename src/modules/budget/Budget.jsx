@@ -7,6 +7,7 @@ import useBudget from './hooks/useBudget'
 import useTrips from '../trips/hooks/useTrips'
 import { BUDGET_CATEGORIES } from '../../utils/constants'
 import { formatDateShort, todayISO } from '../../utils/dateUtils'
+import { useApp } from '../../context/AppContext'
 
 const getCat = (v) => BUDGET_CATEGORIES.find(c => c.value === v) || { label: 'Divers', icon: '📦', value: 'misc' }
 
@@ -152,7 +153,8 @@ const ExpenseRow = ({ expense, onEdit, onDelete }) => {
 const Budget = () => {
   const { id }   = useParams()
   const navigate = useNavigate()
-  const { getTripById } = useTrips()
+  const { } = useTrips()
+  const { getTripById } = useApp()
   const { expenses, totalBudget, totalSpent, remaining, addExpense, updateExpense, deleteExpense } = useBudget(id)
 
   const trip = getTripById(id)

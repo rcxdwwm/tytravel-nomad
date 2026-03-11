@@ -7,6 +7,7 @@ import useBookings from './hooks/useBookings'
 import useTrips from '../trips/hooks/useTrips'
 import { BOOKING_LINKS, BOOKING_TYPE_LABELS } from '../../utils/constants'
 import { formatDateShort } from '../../utils/dateUtils'
+import { useApp } from '../../context/AppContext'
 
 // ── Config des onglets ───────────────────────────────────────
 const TABS = [
@@ -266,7 +267,8 @@ const QuickLinks = ({ type }) => {
 const Bookings = () => {
   const { id }   = useParams()
   const navigate = useNavigate()
-  const { getTripById } = useTrips()
+  const { } = useTrips()
+  const { getTripById } = useApp()
   const { tripBookings, addBooking, updateBooking, deleteBooking, getByType } = useBookings(id)
 
   const trip = getTripById(id)

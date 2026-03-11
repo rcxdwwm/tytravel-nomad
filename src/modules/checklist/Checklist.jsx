@@ -6,6 +6,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import useChecklist from './hooks/useChecklist'
 import useTrips from '../trips/hooks/useTrips'
 import { CHECKLIST_TEMPLATES } from '../../utils/constants'
+import { useApp } from '../../context/AppContext'
 
 // ── Catégories d'items ───────────────────────────────────────
 const CATEGORIES = [
@@ -118,7 +119,8 @@ const CheckItem = ({ item, onToggle, onDelete }) => {
 const Checklist = () => {
   const { id }   = useParams()
   const navigate = useNavigate()
-  const { getTripById } = useTrips()
+  const { } = useTrips()
+  const { getTripById } = useApp()
   const { items, progress, loadTemplate, toggleItem, addItem, deleteItem, resetChecklist } = useChecklist(id)
 
   const trip = getTripById(id)
