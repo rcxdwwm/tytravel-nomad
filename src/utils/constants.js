@@ -74,6 +74,9 @@ export const BOOKING_LINKS = {
     { name: 'Google Vols', url: 'https://www.google.fr/flights',     icon: '✈️' },
     { name: 'Transavia',   url: 'https://www.transavia.com',         icon: '✈️' },
     { name: 'EasyJet',     url: 'https://www.easyjet.com/fr',        icon: '✈️' },
+    { name: 'Ryanair',     url: 'https://www.ryanair.com/fr',        icon: '✈️' },
+    { name: 'Volotea',     url: 'https://www.volotea.com/fr',        icon: '✈️' },
+
   ],
   hotels: [
     { name: 'Booking.com', url: 'https://www.booking.com',           icon: '🏨' },
@@ -82,9 +85,14 @@ export const BOOKING_LINKS = {
     { name: 'Expedia',     url: 'https://www.expedia.fr',            icon: '🏨' },
   ],
   cars: [
+    { name: 'Booking.com', url: 'https://www.booking.com',           icon: '🚗' },
     { name: 'Rentalcars',  url: 'https://www.rentalcars.com/fr',     icon: '🚗' },
+    { name: 'BSP auto',    url: 'https://www.bsp-auto.com/fr',     icon: '🚗' },
     { name: 'Europcar',    url: 'https://www.europcar.com',          icon: '🚗' },
     { name: 'Hertz',       url: 'https://www.hertz.fr',              icon: '🚗' },
+    { name: 'Avis',        url: 'https://www.avis.fr',               icon: '🚗' },
+    { name: 'Sixt',        url: 'https://www.sixt.fr',               icon: '🚗' },
+    { name: 'Enterprise',  url: 'https://www.enterprise.fr',         icon: '🚗' },
   ],
   trains: [
     { name: 'SNCF',        url: 'https://www.sncf-connect.com',      icon: '🚄' },
