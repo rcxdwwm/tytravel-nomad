@@ -3,27 +3,26 @@ import React from 'react'
 import { NavLink } from 'react-router-dom'
 
 const NAV = [
-  { to: '/',          label: 'Accueil',  icon: '🏠' },
-  { to: '/voyages',   label: 'Voyages',  icon: '✈️' },
-  { to: '/liens',     label: 'Liens',    icon: '🔗' },
-  { to: '/archives',  label: 'Archives', icon: '📦' },
-  { to: '/parametres',label: 'Infos & paramètres', icon: '⚙️' },
+  { to: '/',           label: 'Accueil',  icon: '🏠' },
+  { to: '/voyages',    label: 'Voyages',  icon: '✈️' },
+  { to: '/liens',      label: 'Liens',    icon: '🔗' },
+  { to: '/archives',   label: 'Archives', icon: '📦' },
+  { to: '/parametres', label: 'Infos',    icon: '⚙️' },
 ]
 
 const BottomNav = () => (
-  <nav style={{
-    position: 'fixed',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    zIndex: 40,
-    background: 'var(--color-bg-card)',
-    borderTop: '1px solid var(--color-border)',
-    backdropFilter: 'blur(12px)',
-    WebkitBackdropFilter: 'blur(12px)',
-  }}>
-    {/* Safe area pour les téléphones avec encoche */}
-    <div style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
+  <>
+    <nav style={{
+      position: 'fixed',
+      bottom: 0,
+      left: 0,
+      right: 0,
+      zIndex: 40,
+      background: 'var(--color-bg-card)',
+      borderTop: '1px solid var(--color-border)',
+      backdropFilter: 'blur(12px)',
+      WebkitBackdropFilter: 'blur(12px)',
+    }}>
       <div style={{
         maxWidth: 600,
         margin: '0 auto',
@@ -52,7 +51,6 @@ const BottomNav = () => (
           >
             {({ isActive }) => (
               <>
-                {/* Indicateur actif */}
                 {isActive && (
                   <div style={{
                     position: 'absolute',
@@ -79,8 +77,19 @@ const BottomNav = () => (
           </NavLink>
         ))}
       </div>
-    </div>
-  </nav>
+    </nav>
+
+    {/* Remplit la zone home indicator iPhone avec la même couleur */}
+    <div style={{
+      position: 'fixed',
+      bottom: 0,
+      left: 0,
+      right: 0,
+      height: 'env(safe-area-inset-bottom, 0px)',
+      background: 'var(--color-bg-card)',
+      zIndex: 39,
+    }} />
+  </>
 )
 
 export default BottomNav
