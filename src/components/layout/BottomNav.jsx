@@ -22,6 +22,7 @@ const BottomNav = () => (
       borderTop: '1px solid var(--color-border)',
       backdropFilter: 'blur(12px)',
       WebkitBackdropFilter: 'blur(12px)',
+      paddingBottom: 'env(safe-area-inset-bottom, 34px)',
     }}>
       <div style={{
         maxWidth: 600,
