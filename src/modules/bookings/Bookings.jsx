@@ -66,7 +66,8 @@ const FIELDS_BY_TYPE = {
     { key:'address',      label:'Adresse',                   placeholder:'Carrer de Mallorca 1, Barcelone' },
     { key:'checkIn',      label:'Check-in',                  type:'date' },
     { key:'checkInTime',  label:'Heure check-in',            type:'time' },
-    { key:'checkOut',     label:'Check-out',                 type:'date' },
+    //{ key:'checkOut',     label:'Check-out',                 type:'date' },
+    { key:'checkOut',     label:'Check-out',                  type:'date',          minFrom:'checkIn' },
     { key:'checkOutTime', label:'Heure check-out',           type:'time' },
     { key:'phone',        label:'Téléphone',                 placeholder:'+34 93 000 00 00' },
     { key:'price',        label:'Coût total (€)',            type:'number', placeholder:'0.00' },
@@ -80,7 +81,8 @@ const FIELDS_BY_TYPE = {
     { key:'pickupDate',   label:'Date de prise',             type:'date' },
     { key:'pickupTime',   label:'Heure de prise',            type:'time' },
     { key:'returnPlace',  label:'Lieu de restitution',       placeholder:'Même agence' },
-    { key:'returnDate',   label:'Date de retour',            type:'date' },
+    //{ key:'returnDate',   label:'Date de retour',            type:'date' },
+    { key:'returnDate',   label:'Date de retour',            type:'date',           minFrom:'pickupDate' },
     { key:'returnTime',   label:'Heure de retour',           type:'time' },
     { key:'carType',      label:'Catégorie / Véhicule',      placeholder:'Citadine, SUV…' },
     { key:'price',        label:'Coût total (€)',            type:'number', placeholder:'0.00' },
@@ -106,7 +108,8 @@ const FIELDS_BY_TYPE = {
     { key:'address',      label:'Adresse',                   placeholder:'Zone A, Terminal 2' },
     { key:'startDate',    label:"Date d'entrée",             type:'date' },
     { key:'startTime',    label:"Heure d'entrée",            type:'time' },
-    { key:'endDate',      label:'Date de sortie',            type:'date' },
+    //{ key:'endDate',      label:'Date de sortie',            type:'date' },
+    { key:'endDate',      label:'Date de sortie',            type:'date',             minFrom:'startDate' },
     { key:'endTime',      label:'Heure de sortie',           type:'time' },
     { key:'price',        label:'Coût (€)',                  type:'number', placeholder:'0.00' },
     { key:'link',         label:'Lien de gestion',           type:'quicklink' },
@@ -116,7 +119,8 @@ const FIELDS_BY_TYPE = {
     { key:'confirmation', label:'N° de police',              placeholder:'Ex: POL-2025-XXXX', required:true },
     { key:'company',      label:'Assureur',                  placeholder:'AXA, Allianz…' },
     { key:'startDate',    label:'Début de validité',         type:'date' },
-    { key:'endDate',      label:'Fin de validité',           type:'date' },
+    //{ key:'endDate',      label:'Fin de validité',           type:'date' },
+    { key:'endDate',      label:'Fin de validité',           type:'date',             minFrom:'startDate' },
     { key:'emergency',    label:'N° urgence 24h/24',         placeholder:'+33 1 00 00 00 00' },
     { key:'coverage',     label:'Garanties',                 placeholder:'Annulation, rapatriement, bagages…' },
     { key:'price',        label:'Prime (€)',                 type:'number', placeholder:'0.00' },
@@ -272,7 +276,7 @@ const BookingForm = ({ type, initial, onSave, onCancel }) => {
               ) : f.multiline ? (
                 <textarea value={form[f.key]} onChange={e => set(f.key, e.target.value)} placeholder={f.placeholder} rows={2} style={inp(!!errors[f.key], true)} onFocus={e => e.target.style.borderColor = 'var(--color-primary)'} onBlur={e => e.target.style.borderColor = errors[f.key] ? '#f87171' : 'var(--color-border)'} />
               ) : (
-                <input type={f.type || 'text'} value={form[f.key]} onChange={e => set(f.key, e.target.value)} placeholder={f.placeholder} style={inp(!!errors[f.key])} onFocus={e => e.target.style.borderColor = 'var(--color-primary)'} onBlur={e => e.target.style.borderColor = errors[f.key] ? '#f87171' : 'var(--color-border)'} />
+                <input type={f.type || 'text'} value={form[f.key]} onChange={e => set(f.key, e.target.value)} placeholder={f.placeholder} min={f.minFrom && form[f.minFrom] ? form[f.minFrom] : undefined} style={inp(!!errors[f.key])} onFocus={e => e.target.style.borderColor = 'var(--color-primary)'} onBlur={e => e.target.style.borderColor = errors[f.key] ? '#f87171' : 'var(--color-border)'} />
               )}
               {errors[f.key] && <p style={{ fontSize: '.7rem', color: '#f87171', margin: '.2rem 0 0' }}>{errors[f.key]}</p>}
             </div>

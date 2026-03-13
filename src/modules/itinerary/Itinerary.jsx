@@ -165,10 +165,10 @@ const ActivityRow = ({ activity, onEdit, onDelete }) => {
 
         {/* Détails dépliables */}
         {open && (activity.place || activity.note) && (
-          <div style={{ marginTop:'.5rem', paddingTop:'.5rem', borderTop:'1px solid var(--color-border)' }}>
+          <div style={{ marginTop:'.5rem', paddingTop:'.5rem', borderTop:'1px solid var(--color-border)', overflow:'hidden' }}>
             {activity.place && (
-              <div style={{ margin:'0 0 .35rem' }}>
-                <p style={{ fontSize:'.75rem', color:'var(--color-text-muted)', margin:'0 0 .3rem', lineHeight:1.4, wordBreak:'break-word' }}>
+              <div style={{ marginBottom:'.35rem' }}>
+                <p style={{ fontSize:'.75rem', color:'var(--color-text-muted)', margin:'0 0 .3rem', lineHeight:1.4, wordBreak:'break-word', whiteSpace:'normal', overflowWrap:'anywhere' }}>
                   📍 {activity.place}
                 </p>
                 <a
@@ -182,7 +182,11 @@ const ActivityRow = ({ activity, onEdit, onDelete }) => {
                 </a>
               </div>
             )}
-            {activity.note && <p style={{ fontSize:'.75rem', color:'var(--color-text-muted)', margin:0, fontStyle:'italic' }}>💬 {activity.note}</p>}
+            {activity.note && (
+              <p style={{ fontSize:'.75rem', color:'var(--color-text-muted)', margin:0, fontStyle:'italic', wordBreak:'break-word', whiteSpace:'normal' }}>
+                💬 {activity.note}
+              </p>
+            )}
           </div>
         )}
       </div>
@@ -309,7 +313,7 @@ const Itinerary = () => {
             id:            `import-${hotel.id}-in`,
             fromBookingId: hotel.id,
             type:          'hotel',
-            title:         `🏨 Check-in — ${hotel.name}`,
+            title:         `Check-in — ${hotel.name}`,
             time:          hotel.checkInTime || '',
             place:         hotel.address || '',
             note:          hotel.confirmation ? `Réf: ${hotel.confirmation}` : '',
@@ -321,7 +325,7 @@ const Itinerary = () => {
             id:            `import-${hotel.id}-out`,
             fromBookingId: `${hotel.id}-out`,
             type:          'hotel',
-            title:         `🏨 Check-out — ${hotel.name}`,
+            title:         `Check-out — ${hotel.name}`,
             time:          hotel.checkOutTime || '',
             place:         hotel.address || '',
             note:          hotel.confirmation ? `Réf: ${hotel.confirmation}` : '',
