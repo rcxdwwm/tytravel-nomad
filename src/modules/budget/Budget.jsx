@@ -11,13 +11,13 @@ import { useApp } from '../../context/AppContext'
 
 const getCat = (v) => BUDGET_CATEGORIES.find(c => c.value === v) || { label: 'Divers', icon: '📦', value: 'misc' }
 
-// ── Barre de progression colorée ────────────────────────────
-const ProgressBar = ({ pct, color = 'var(--color-primary)', warn = false }) => (
+// ── Barre de progression ─────────────────────────────────────
+const ProgressBar = ({ pct, warn = false }) => (
   <div style={{ height: 6, background: 'var(--color-bg-input)', borderRadius: 3, overflow: 'hidden' }}>
     <div style={{
       height: '100%',
       width: `${Math.min(100, pct)}%`,
-      background: warn && pct > 90 ? '#ef4444' : pct > 75 ? '#f59e0b' : color,
+      background: warn && pct > 90 ? '#ef4444' : pct > 75 ? '#f59e0b' : '#10b981',
       borderRadius: 3,
       transition: 'width .5s ease',
     }} />
@@ -27,7 +27,7 @@ const ProgressBar = ({ pct, color = 'var(--color-primary)', warn = false }) => (
 // ── Formulaire dépense ───────────────────────────────────────
 const ExpenseForm = ({ initial, onSave, onCancel }) => {
   const [form, setForm] = useState(initial || {
-    label: '', amount: '', category: 'food', date: todayISO(), note: '',
+    label: '', amount: '', category: 'misc', date: todayISO(), note: '',
   })
   const [errors, setErrors] = useState({})
 
@@ -35,7 +35,7 @@ const ExpenseForm = ({ initial, onSave, onCancel }) => {
 
   const save = () => {
     const e = {}
-    if (!form.label.trim())           e.label  = 'Libellé obligatoire'
+    if (!form.label.trim())               e.label  = 'Libellé obligatoire'
     if (!form.amount || form.amount <= 0) e.amount = 'Montant invalide'
     if (Object.keys(e).length) { setErrors(e); return }
     onSave({ ...form, amount: parseFloat(form.amount) })
@@ -112,7 +112,7 @@ const ExpenseForm = ({ initial, onSave, onCancel }) => {
           </div>
         </div>
 
-        <div style={{ padding: '.9rem 1.25rem', borderTop: '1px solid var(--color-border)', flexShrink: 0, display: 'flex', gap: '.6rem' }}>
+        <div style={{ padding: '.9rem 1.25rem', paddingBottom: 'calc(.9rem + env(safe-area-inset-bottom, 34px))', borderTop: '1px solid var(--color-border)', flexShrink: 0, display: 'flex', gap: '.6rem' }}>
           <button onClick={onCancel} style={{ flex: 1, padding: '.65rem', borderRadius: 12, border: '1px solid var(--color-border)', background: 'none', color: 'var(--color-text-muted)', cursor: 'pointer', fontSize: '.88rem' }}>Annuler</button>
           <button onClick={save} style={{ flex: 2, padding: '.65rem', borderRadius: 12, border: 'none', background: '#10b981', color: '#fff', cursor: 'pointer', fontSize: '.92rem', fontWeight: 700, boxShadow: '0 4px 12px rgba(16,185,129,.3)' }}>
             {initial ? 'Enregistrer' : '💸 Ajouter'}
@@ -135,6 +135,7 @@ const ExpenseRow = ({ expense, onEdit, onDelete }) => {
       <div style={{ flex: 1, minWidth: 0 }}>
         <p style={{ fontWeight: 600, fontSize: '.88rem', color: 'var(--color-text)', margin: '0 0 .1rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{expense.label}</p>
         <p style={{ fontSize: '.72rem', color: 'var(--color-text-muted)', margin: 0 }}>{cat.label} · {formatDateShort(expense.date)}</p>
+        {expense.note && <p style={{ fontSize: '.7rem', color: 'var(--color-text-muted)', margin: '.1rem 0 0', fontStyle: 'italic', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{expense.note}</p>}
       </div>
       <span style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", fontWeight: 800, fontSize: '.95rem', color: '#10b981', flexShrink: 0 }}>
         {expense.amount.toFixed(2)} €
@@ -153,7 +154,7 @@ const ExpenseRow = ({ expense, onEdit, onDelete }) => {
 const Budget = () => {
   const { id }   = useParams()
   const navigate = useNavigate()
-  const { } = useTrips()
+  const { updateTrip } = useTrips()
   const { getTripById } = useApp()
   const { expenses, totalBudget, totalSpent, remaining, addExpense, updateExpense, deleteExpense } = useBudget(id)
 
@@ -161,34 +162,16 @@ const Budget = () => {
 
   const [showForm,   setShowForm]   = useState(false)
   const [editTarget, setEditTarget] = useState(null)
-  const [activeFilter, setActiveFilter] = useState('all')
+  const [editBudget,  setEditBudget]  = useState(false) 
+  const [budgetInput, setBudgetInput] = useState('')
 
-  // Dépenses par catégorie
-  const byCategory = useMemo(() => {
-    const map = {}
-    expenses.forEach(e => {
-      if (!map[e.category]) map[e.category] = 0
-      map[e.category] += e.amount
-    })
-    return map
-  }, [expenses])
-
-  // Top catégories triées par montant
-  const topCategories = useMemo(() =>
-    BUDGET_CATEGORIES
-      .filter(c => byCategory[c.value] > 0)
-      .map(c => ({ ...c, total: byCategory[c.value] }))
-      .sort((a, b) => b.total - a.total),
-    [byCategory]
+  // Dépenses triées par date décroissante
+  const sorted = useMemo(() =>
+    [...expenses].sort((a, b) => new Date(b.date) - new Date(a.date)),
+    [expenses]
   )
 
-  // Filtrage
-  const filtered = useMemo(() => {
-    const list = activeFilter === 'all' ? expenses : expenses.filter(e => e.category === activeFilter)
-    return [...list].sort((a, b) => new Date(b.date) - new Date(a.date))
-  }, [expenses, activeFilter])
-
-  const budgetPct  = totalBudget > 0 ? Math.round((totalSpent / totalBudget) * 100) : 0
+  const budgetPct    = totalBudget > 0 ? Math.round((totalSpent / totalBudget) * 100) : 0
   const isOverBudget = totalBudget > 0 && totalSpent > totalBudget
 
   const handleSave = (data) => {
@@ -215,7 +198,8 @@ const Budget = () => {
             {trip?.name}
           </h1>
         </div>
-        <button onClick={() => { setEditTarget(null); setShowForm(true) }} style={{ display: 'flex', alignItems: 'center', gap: '.35rem', background: '#10b981', color: '#fff', border: 'none', borderRadius: 12, padding: '.6rem 1rem', fontSize: '.85rem', fontWeight: 600, cursor: 'pointer', boxShadow: '0 4px 12px rgba(16,185,129,.3)' }}>
+        <button onClick={() => { setEditTarget(null); setShowForm(true) }}
+          style={{ display: 'flex', alignItems: 'center', gap: '.35rem', background: '#10b981', color: '#fff', border: 'none', borderRadius: 12, padding: '.6rem 1rem', fontSize: '.85rem', fontWeight: 600, cursor: 'pointer', boxShadow: '0 4px 12px rgba(16,185,129,.3)' }}>
           <span>+</span> Dépense
         </button>
       </div>
@@ -223,21 +207,25 @@ const Budget = () => {
       {/* Résumé budget */}
       <div style={{ background: isOverBudget ? 'linear-gradient(135deg, var(--color-bg-card), #ef444411)' : 'var(--color-bg-card)', border: `1px solid ${isOverBudget ? '#ef4444' : 'var(--color-border)'}`, borderRadius: 18, padding: '1.1rem', marginBottom: '1rem', animation: 'fadeUp .35s .05s ease both' }}>
 
-        {/* Chiffres clés */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '.5rem', marginBottom: '1rem' }}>
+        {/* 3 chiffres clés */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '.5rem', marginBottom: totalBudget > 0 ? '1rem' : 0 }}>
           {[
-            { label: 'Dépensé', value: `${totalSpent.toFixed(2)} €`, color: '#10b981' },
-            { label: 'Budget prévu', value: totalBudget > 0 ? `${totalBudget} €` : '—', color: 'var(--color-primary)' },
-            { label: remaining >= 0 ? 'Restant' : 'Dépassement', value: `${Math.abs(remaining).toFixed(2)} €`, color: remaining >= 0 ? 'var(--color-accent)' : '#ef4444' },
+            { label:'Dépensé', value:`${totalSpent.toFixed(2)} €`, color:'#10b981' },
+            { label:'Budget prévu', value: totalBudget > 0 ? `${totalBudget} €` : 'Définir', color:'var(--color-primary)', editable:true },
+            { label: remaining >= 0 ? 'Restant' : 'Dépassement', value:`${Math.abs(remaining).toFixed(2)} €`, color: remaining >= 0 ? 'var(--color-accent)' : '#ef4444' },
           ].map(s => (
-            <div key={s.label} style={{ textAlign: 'center', padding: '.6rem .3rem', background: 'var(--color-bg-input)', borderRadius: 12 }}>
-              <p style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", fontSize: '1.1rem', fontWeight: 800, color: s.color, margin: '0 0 .15rem', lineHeight: 1 }}>{s.value}</p>
-              <p style={{ fontSize: '.65rem', textTransform: 'uppercase', letterSpacing: '.04em', color: 'var(--color-text-muted)', margin: 0 }}>{s.label}</p>
+            <div key={s.label} style={{ textAlign:'center', padding:'.6rem .3rem', background:'var(--color-bg-input)', borderRadius:12, position:'relative' }}>
+              <p style={{ fontFamily:"'Plus Jakarta Sans',sans-serif", fontSize:'1.05rem', fontWeight:800, color:s.color, margin:'0 0 .15rem', lineHeight:1 }}>{s.value}</p>
+              <p style={{ fontSize:'.62rem', textTransform:'uppercase', letterSpacing:'.04em', color:'var(--color-text-muted)', margin:0 }}>{s.label}</p>
+              {s.editable && (
+                <button onClick={() => { setBudgetInput(totalBudget || ''); setEditBudget(true) }}
+                  style={{ position:'absolute', top:4, right:4, background:'none', border:'none', cursor:'pointer', fontSize:'.7rem', color:'var(--color-text-muted)' }}>✏️</button>
+              )}
             </div>
           ))}
         </div>
 
-        {/* Barre de progression globale */}
+        {/* Barre de progression */}
         {totalBudget > 0 && (
           <div>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '.35rem' }}>
@@ -257,61 +245,58 @@ const Budget = () => {
         )}
       </div>
 
-      {/* Répartition par catégorie */}
-      {topCategories.length > 0 && (
-        <div style={{ background: 'var(--color-bg-card)', border: '1px solid var(--color-border)', borderRadius: 16, padding: '1rem', marginBottom: '1rem', animation: 'fadeUp .35s .1s ease both' }}>
-          <p style={{ fontSize: '.8rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.07em', color: 'var(--color-text-muted)', margin: '0 0 .75rem' }}>📊 Répartition</p>
-          {topCategories.map(c => (
-            <div key={c.value} style={{ marginBottom: '.65rem' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '.3rem' }}>
-                <span style={{ fontSize: '.82rem', color: 'var(--color-text)', display: 'flex', alignItems: 'center', gap: '.35rem' }}>
-                  {c.icon} {c.label}
-                </span>
-                <span style={{ fontSize: '.82rem', fontWeight: 700, color: '#10b981' }}>{c.total.toFixed(2)} €
-                  <span style={{ fontSize: '.7rem', fontWeight: 400, color: 'var(--color-text-muted)', marginLeft: '.3rem' }}>
-                    ({totalSpent > 0 ? Math.round(c.total / totalSpent * 100) : 0}%)
-                  </span>
-                </span>
-              </div>
-              <ProgressBar pct={totalSpent > 0 ? (c.total / totalSpent) * 100 : 0} color="#10b981" />
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* Filtres catégorie */}
-      {expenses.length > 0 && (
-        <div style={{ display: 'flex', gap: '.35rem', overflowX: 'auto', paddingBottom: '.4rem', marginBottom: '.85rem', animation: 'fadeUp .35s .15s ease both' }}>
-          <button onClick={() => setActiveFilter('all')} style={{ flexShrink: 0, padding: '.35rem .8rem', borderRadius: 20, border: '1px solid', fontSize: '.75rem', fontWeight: 600, cursor: 'pointer', background: activeFilter === 'all' ? 'var(--color-primary)' : 'var(--color-bg-card)', borderColor: activeFilter === 'all' ? 'var(--color-primary)' : 'var(--color-border)', color: activeFilter === 'all' ? '#fff' : 'var(--color-text-muted)' }}>
-            Toutes ({expenses.length})
-          </button>
-          {topCategories.map(c => (
-            <button key={c.value} onClick={() => setActiveFilter(c.value)} style={{ flexShrink: 0, display: 'flex', alignItems: 'center', gap: '.3rem', padding: '.35rem .8rem', borderRadius: 20, border: '1px solid', fontSize: '.75rem', fontWeight: 600, cursor: 'pointer', background: activeFilter === c.value ? '#10b98122' : 'var(--color-bg-card)', borderColor: activeFilter === c.value ? '#10b981' : 'var(--color-border)', color: activeFilter === c.value ? '#10b981' : 'var(--color-text-muted)' }}>
-              {c.icon} {c.label}
-            </button>
-          ))}
-        </div>
-      )}
-
       {/* Liste dépenses */}
-      <div style={{ animation: 'fadeUp .35s .2s ease both' }}>
-        {filtered.length === 0 ? (
+      <div style={{ animation: 'fadeUp .35s .1s ease both' }}>
+        {sorted.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '2rem 1rem', background: 'var(--color-bg-card)', border: '1px dashed var(--color-border)', borderRadius: 14 }}>
             <p style={{ fontSize: '2rem', margin: '0 0 .5rem' }}>💶</p>
             <p style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", fontWeight: 700, color: 'var(--color-text)', margin: '0 0 .35rem' }}>Aucune dépense</p>
-            <p style={{ fontSize: '.8rem', color: 'var(--color-text-muted)', margin: '0 0 1rem' }}>Notez vos dépenses au fil du voyage</p>
+            <p style={{ fontSize: '.8rem', color: 'var(--color-text-muted)', margin: '0 0 .5rem' }}>
+              Notez vos dépenses au fil du voyage
+            </p>
+            <p style={{ fontSize: '.75rem', color: 'var(--color-text-muted)', margin: '0 0 1rem' }}>
+              💡 Ou importez-les depuis vos réservations via "➕ Ajouter au budget"
+            </p>
             <button onClick={() => { setEditTarget(null); setShowForm(true) }} style={{ background: '#10b981', color: '#fff', border: 'none', borderRadius: 12, padding: '.6rem 1.2rem', fontSize: '.85rem', fontWeight: 600, cursor: 'pointer' }}>
               + Ajouter une dépense
             </button>
           </div>
         ) : (
-          filtered.map(e => (
+          sorted.map(e => (
             <ExpenseRow key={e.id} expense={e} onEdit={(exp) => { setEditTarget(exp); setShowForm(true) }} onDelete={deleteExpense} />
           ))
         )}
       </div>
 
       {/* Formulaire */}
+      {editBudget && (
+        <div style={{ position:'fixed', inset:0, zIndex:60, display:'flex', alignItems:'center', justifyContent:'center', padding:'1rem' }} onClick={() => setEditBudget(false)}>
+          <div style={{ position:'absolute', inset:0, background:'rgba(0,0,0,.65)', backdropFilter:'blur(4px)' }} />
+          <div style={{ position:'relative', background:'var(--color-bg-card)', border:'1px solid var(--color-border)', borderRadius:22, padding:'1.5rem', maxWidth:300, width:'100%', textAlign:'center' }} onClick={e => e.stopPropagation()}>
+            <p style={{ fontFamily:"'Plus Jakarta Sans',sans-serif", fontWeight:700, fontSize:'1rem', color:'var(--color-text)', margin:'0 0 1rem' }}>💶 Budget prévu</p>
+            <input
+              type="number" min="0" step="1"
+              value={budgetInput}
+              onChange={e => setBudgetInput(e.target.value)}
+              placeholder="Ex: 2000"
+              autoFocus
+              style={{ width:'100%', background:'var(--color-bg-input)', border:'1px solid var(--color-border)', borderRadius:10, padding:'.65rem .8rem', fontSize:'1rem', color:'var(--color-text)', outline:'none', boxSizing:'border-box', textAlign:'center', marginBottom:'1rem' }}
+              onFocus={e => e.target.style.borderColor='var(--color-primary)'}
+              onBlur={e => e.target.style.borderColor='var(--color-border)'}
+            />
+            <div style={{ display:'flex', gap:'.6rem' }}>
+              <button onClick={() => setEditBudget(false)} style={{ flex:1, padding:'.65rem', borderRadius:12, border:'1px solid var(--color-border)', background:'none', color:'var(--color-text-muted)', cursor:'pointer', fontSize:'.88rem' }}>Annuler</button>
+              <button onClick={() => {
+                updateTrip(id, { budget: parseFloat(budgetInput) || 0 })
+                setEditBudget(false)
+              }} style={{ flex:2, padding:'.65rem', borderRadius:12, border:'none', background:'var(--color-primary)', color:'#fff', cursor:'pointer', fontSize:'.88rem', fontWeight:700 }}>
+                Enregistrer
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {showForm && (
         <ExpenseForm initial={editTarget} onSave={handleSave} onCancel={() => { setShowForm(false); setEditTarget(null) }} />
       )}
@@ -320,3 +305,4 @@ const Budget = () => {
 }
 
 export default Budget
+

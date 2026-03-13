@@ -68,6 +68,15 @@ export const BOOKING_TYPE_LABELS = {
 
 // ── Liens rapides vers sites de réservation ──────────────────
 export const BOOKING_LINKS = {
+  parking: [
+    { name: 'AlterPark-Nantes',     url: 'https://www.alterpark.fr',         icon: '🅿️' },
+    { name: 'Parclick',             url: 'https://www.parclick.fr',          icon: '🅿️' },
+    { name: 'Parkopedia',           url: 'https://www.parkopedia.fr',        icon: '🅿️' },
+    { name: 'Onepark',              url: 'https://www.onepark.fr',           icon: '🅿️' },
+    { name: 'Parkingsdeparis',      url: 'https://www.parkingsdeparis.fr',  icon: '🅿️' },
+    { name: 'Parcify',              url: 'https://www.parcify.com/fr',       icon: '🅿️' },
+  ],
+  
   flights: [
     { name: 'Skyscanner',  url: 'https://www.skyscanner.fr',         icon: '✈️' },
     { name: 'Kayak',       url: 'https://www.kayak.fr',              icon: '✈️' },
@@ -87,7 +96,7 @@ export const BOOKING_LINKS = {
   cars: [
     { name: 'Booking.com', url: 'https://www.booking.com',           icon: '🚗' },
     { name: 'Rentalcars',  url: 'https://www.rentalcars.com/fr',     icon: '🚗' },
-    { name: 'BSP auto',    url: 'https://www.bsp-auto.com/fr',     icon: '🚗' },
+    { name: 'BSP auto',    url: 'https://www.bsp-auto.com/fr',       icon: '🚗' },
     { name: 'Europcar',    url: 'https://www.europcar.com',          icon: '🚗' },
     { name: 'Hertz',       url: 'https://www.hertz.fr',              icon: '🚗' },
     { name: 'Avis',        url: 'https://www.avis.fr',               icon: '🚗' },
@@ -103,6 +112,7 @@ export const BOOKING_LINKS = {
 
 // ── Catégories de dépenses budget ───────────────────────────
 export const BUDGET_CATEGORIES = [
+  { value: 'parking',      label: 'Parkings',      icon: '🅿️' },
   { value: 'flight',       label: 'Vol',           icon: '✈️' },
   { value: 'accommodation',label: 'Hébergement',   icon: '🏨' },
   { value: 'transport',    label: 'Transport',     icon: '🚗' },
