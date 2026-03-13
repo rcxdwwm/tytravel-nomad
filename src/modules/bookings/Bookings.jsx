@@ -227,7 +227,27 @@ const BookingForm = ({ type, initial, onSave, onCancel }) => {
   const [errors, setErrors] = useState({})
 
   const set = (k, v) => {
-    setForm(f => ({ ...f, [k]: v }))
+    setForm(f => {
+      const updated = { ...f, [k]: v }
+      const pairs = [
+        ['checkIn',    'checkOut'],
+        ['pickupDate', 'returnDate'],
+        ['startDate',  'endDate'],
+      ]
+      pairs.forEach(([start, end]) => {
+        // Date de fin antérieure → on la cale sur le début
+        if (k === end && updated[start] && v < updated[start]) {
+          updated[end] = updated[start]
+        }
+        // Date de début modifiée → on pré-remplit la fin si vide OU si elle devient antérieure
+        if (k === start) {
+          if (!updated[end] || updated[end] < v) {
+            updated[end] = v  // ← pré-remplit avec la date de début
+          }
+        }
+      })
+      return updated
+    })
     setErrors(e => ({ ...e, [k]: null }))
   }
 
