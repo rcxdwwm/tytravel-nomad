@@ -326,12 +326,18 @@ const BookingCard = ({ booking, onEdit, onDelete, onAddToBudget }) => {
               <span style={{ fontSize: '.8rem', fontWeight: 700, color: '#10b981' }}>
                 💶 {parseFloat(booking.price).toFixed(2)} €
               </span>
-              <button
-                onClick={() => onAddToBudget(booking)}
-                style={{ fontSize: '.68rem', fontWeight: 600, padding: '.2rem .55rem', borderRadius: 20, border: `1px solid #10b98155`, background: '#10b98115', color: '#10b981', cursor: 'pointer' }}
-              >
-                ➕ Ajouter au budget
-              </button>
+              {booking.addedToBudget ? (
+                <span style={{ fontSize: '.68rem', fontWeight: 600, padding: '.2rem .55rem', borderRadius: 20, border: '1px solid #10b98155', background: '#10b98115', color: '#10b981' }}>
+                  ✅ Ajouté au budget
+                </span>
+              ) : (
+                <button
+                  onClick={() => onAddToBudget(booking)}
+                  style={{ fontSize: '.68rem', fontWeight: 600, padding: '.2rem .55rem', borderRadius: 20, border: '1px solid #10b98155', background: '#10b98115', color: '#10b981', cursor: 'pointer' }}
+                >
+                  ➕ Ajouter au budget
+                </button>
+              )}
             </div>
           )}
 
@@ -422,6 +428,8 @@ const Bookings = () => {
       date,
       note: `Importé depuis ${tab?.label} — ${booking.confirmation || ''}`.trim(),
     })
+    // ← Marquer la réservation comme ajoutée au budget
+    updateBooking(booking.id, { addedToBudget: true })
     showToast(`💶 ${label} ajouté au budget`)
   }
 
@@ -430,7 +438,10 @@ const Bookings = () => {
       <style>{`@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}`}</style>
 
       {/* Retour */}
-      <button onClick={() => navigate(`/voyages/${id}`)} style={{ display: 'inline-flex', alignItems: 'center', gap: '.4rem', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--color-text-muted)', fontSize: '.82rem', fontWeight: 500, padding: '0 0 1rem', marginLeft: '-.25rem' }}>
+      <button onClick={() => navigate(`/voyages/${id}`)} style={{ display: 'inline-flex', alignItems: 'center', gap: '.5rem', background: 'var(--color-bg-card)', border: '1px solid var(--color-border)', borderRadius: 12, padding: '.5rem .9rem', cursor: 'pointer', color: 'var(--color-text)', fontSize: '.88rem', fontWeight: 600, marginBottom: '1rem', transition: 'border-color .15s' }}
+        onMouseEnter={e => e.currentTarget.style.borderColor = 'var(--color-primary)'}
+        onMouseLeave={e => e.currentTarget.style.borderColor = 'var(--color-border)'}
+      >
         ← {trip?.name || 'Voyage'}
       </button>
 

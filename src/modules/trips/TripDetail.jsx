@@ -18,38 +18,14 @@ const TRIP_ICONS = {
 
 // ── 4 modules du voyage ───────────────────────────────────────
 const MODULES = [
-  {
-    key: 'itineraire',
-    label: 'Itinéraire',
-    icon: '🗓️',
-    desc: 'Jour par jour',
-    color: '#3b82f6',
-  },
-  {
-    key: 'reservations',
-    label: 'Réservations',
-    icon: '🎫',
-    desc: 'Vols, hôtel, voiture…',
-    color: '#d97c1a',
-  },
-  {
-    key: 'budget',
-    label: 'Budget',
-    icon: '💶',
-    desc: 'Dépenses & prévisions',
-    color: '#10b981',
-  },
-  {
-    key: 'checklist',
-    label: 'Checklist',
-    icon: '✅',
-    desc: 'Pré-départ',
-    color: '#8b5cf6',
-  },
+  { key:'itineraire',   label:'Itinéraire',   icon:'🗓️', desc:'Jour par jour',        color:'#3b82f6' },
+  { key:'reservations', label:'Réservations',  icon:'🎫', desc:'Vols, hôtel, voiture…', color:'#d97c1a' },
+  { key:'budget',       label:'Budget',        icon:'💶', desc:'Dépenses & prévisions', color:'#10b981' },
+  { key:'checklist',    label:'Checklist',     icon:'✅', desc:'Pré-départ',            color:'#8b5cf6' },
 ]
 
 // ── Badge statut ─────────────────────────────────────────────
-const StatusBadge = ({ ongoing, future, past }) => {
+const StatusBadge = ({ ongoing, future }) => {
   if (ongoing) return (
     <span style={{ fontSize:'.7rem', fontWeight:700, padding:'.3rem .75rem', borderRadius:20, background:'#16532233', color:'#4ade80', border:'1px solid #16a34a55', display:'inline-flex', alignItems:'center', gap:'.35rem' }}>
       <span style={{ width:7, height:7, borderRadius:'50%', background:'#4ade80', display:'inline-block', animation:'pulse 1.8s ease infinite' }} />
@@ -84,9 +60,7 @@ const ModuleTile = ({ mod, tripId, navigate, badge }) => (
     onMouseEnter={e => { e.currentTarget.style.borderColor=mod.color; e.currentTarget.style.transform='translateY(-2px)'; e.currentTarget.style.boxShadow=`0 6px 20px ${mod.color}22` }}
     onMouseLeave={e => { e.currentTarget.style.borderColor='var(--color-border)'; e.currentTarget.style.transform='translateY(0)'; e.currentTarget.style.boxShadow='none' }}
   >
-    {/* Accent coloré en haut */}
     <div style={{ position:'absolute', top:0, left:0, right:0, height:3, background:mod.color, borderRadius:'16px 16px 0 0' }} />
-
     <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between' }}>
       <div style={{ width:40, height:40, borderRadius:12, background:`${mod.color}18`, display:'flex', alignItems:'center', justifyContent:'center', fontSize:'1.3rem' }}>
         {mod.icon}
@@ -105,15 +79,6 @@ const ModuleTile = ({ mod, tripId, navigate, badge }) => (
   </button>
 )
 
-// ── Stat rapide ───────────────────────────────────────────────
-const QuickStat = ({ icon, value, label }) => (
-  <div style={{ flex:1, display:'flex', flexDirection:'column', alignItems:'center', gap:'.15rem', padding:'.7rem .3rem', background:'var(--color-bg-input)', borderRadius:12 }}>
-    <span style={{ fontSize:'1rem' }}>{icon}</span>
-    <span style={{ fontFamily:"'Plus Jakarta Sans',sans-serif", fontSize:'1.1rem', fontWeight:700, color:'var(--color-text)', lineHeight:1 }}>{value}</span>
-    <span style={{ fontSize:'.62rem', color:'var(--color-text-muted)', textAlign:'center', lineHeight:1.2 }}>{label}</span>
-  </div>
-)
-
 // ============================================================
 // TripDetail
 // ============================================================
@@ -121,8 +86,7 @@ const TripDetail = () => {
   const { id }     = useParams()
   const navigate   = useNavigate()
   const { deleteTrip } = useTrips()
-  const { getTripById } = useApp()
-  const { bookings, budgets, checklists } = useApp()
+  const { getTripById, bookings, budgets, checklists } = useApp()
 
   const trip = getTripById(id)
 
@@ -139,14 +103,13 @@ const TripDetail = () => {
     </div>
   )
 
-  const ongoing  = isTripOngoing(trip.startDate, trip.endDate)
-  const future   = isTripFuture(trip.startDate)
-  const past     = isTripPast(trip.endDate)
-  const icon     = TRIP_ICONS[trip.type] || TRIP_ICONS.default
-  const duration = daysBetween(trip.startDate, trip.endDate)
+  const ongoing   = isTripOngoing(trip.startDate, trip.endDate)
+  const future    = isTripFuture(trip.startDate)
+  const past      = isTripPast(trip.endDate)
+  const icon      = TRIP_ICONS[trip.type] || TRIP_ICONS.default
+  const duration  = daysBetween(trip.startDate, trip.endDate)
   const countdown = future ? daysUntil(trip.startDate) : null
 
-  // Badges de contenu
   const bookingCount  = (bookings[id] || []).length
   const expenseCount  = (budgets[id]   || []).length
   const checkProgress = (() => {
@@ -155,7 +118,6 @@ const TripDetail = () => {
     return Math.round(items.filter(i => i.checked).length / items.length * 100)
   })()
 
-  // Progression si en cours
   const progressPct = (() => {
     if (!ongoing) return null
     const total   = daysBetween(trip.startDate, trip.endDate) || 1
@@ -175,98 +137,74 @@ const TripDetail = () => {
         @keyframes pulse  { 0%{box-shadow:0 0 0 0 #4ade8055} 70%{box-shadow:0 0 0 8px #4ade8000} 100%{box-shadow:0 0 0 0 #4ade8000} }
       `}</style>
 
-      {/* ── Bouton retour ── */}
+      {/* ── Bouton retour — visible, contrasté ── */}
       <button
         onClick={() => navigate('/voyages')}
-        style={{ display:'inline-flex', alignItems:'center', gap:'.4rem', background:'none', border:'none', cursor:'pointer', color:'var(--color-text-muted)', fontSize:'.82rem', fontWeight:500, padding:'0 0 1rem', marginLeft:'-.25rem' }}
+        style={{
+          display:'inline-flex', alignItems:'center', gap:'.5rem',
+          background:'var(--color-bg-card)',
+          border:'1px solid var(--color-border)',
+          borderRadius:12, padding:'.5rem .9rem',
+          cursor:'pointer',
+          color:'var(--color-text)',
+          fontSize:'.88rem', fontWeight:600,
+          marginBottom:'1rem',
+          transition:'border-color .15s',
+        }}
+        onMouseEnter={e => e.currentTarget.style.borderColor='var(--color-primary)'}
+        onMouseLeave={e => e.currentTarget.style.borderColor='var(--color-border)'}
       >
         ← Mes voyages
       </button>
 
-      {/* ── Carte hero ── */}
+      {/* ── En-tête compact ── */}
       <div style={{
-        background:'linear-gradient(135deg, var(--color-bg-card) 0%, color-mix(in srgb, var(--color-primary) 10%, var(--color-bg-card)) 100%)',
-        border:'1px solid var(--color-primary)',
-        borderRadius:20, padding:'1.25rem',
-        marginBottom:'1.1rem',
+        display:'flex', alignItems:'center', justifyContent:'space-between',
+        gap:'.75rem', marginBottom:'1rem',
         animation:'fadeUp .35s ease both',
-        position:'relative', overflow:'hidden',
       }}>
-        {/* Décor fond */}
-        <div style={{ position:'absolute', right:-20, top:-20, fontSize:'6rem', opacity:.06, lineHeight:1, pointerEvents:'none' }}>{icon}</div>
-
-        {/* Header */}
-        <div style={{ display:'flex', alignItems:'flex-start', justifyContent:'space-between', marginBottom:'.9rem' }}>
-          <div style={{ display:'flex', alignItems:'center', gap:'.75rem' }}>
-            <div style={{ width:52, height:52, borderRadius:15, background:'var(--color-bg-input)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:'2rem', flexShrink:0 }}>
-              {icon}
-            </div>
-            <div>
-              <h1 style={{ fontFamily:"'Plus Jakarta Sans',sans-serif", fontWeight:800, fontSize:'1.25rem', color:'var(--color-text)', margin:'0 0 .25rem', lineHeight:1.2 }}>
-                {trip.name}
-              </h1>
-              <p style={{ fontSize:'.85rem', fontWeight:600, color:'var(--color-primary)', margin:0 }}>
-                📍 {trip.destination}{trip.country ? `, ${trip.country}` : ''}
-              </p>
-            </div>
+        <div style={{ display:'flex', alignItems:'center', gap:'.75rem', minWidth:0 }}>
+          <div style={{ width:46, height:46, borderRadius:14, background:'var(--color-bg-card)', border:'1px solid var(--color-border)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:'1.6rem', flexShrink:0 }}>
+            {icon}
           </div>
-          <StatusBadge ongoing={ongoing} future={future} past={past} />
+          <div style={{ minWidth:0 }}>
+            <h1 style={{ fontFamily:"'Plus Jakarta Sans',sans-serif", fontWeight:800, fontSize:'1.2rem', color:'var(--color-text)', margin:'0 0 .2rem', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
+              {trip.name}
+            </h1>
+            <p style={{ fontSize:'.78rem', color:'var(--color-primary)', fontWeight:600, margin:0, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
+              📍 {trip.destination}{trip.country ? `, ${trip.country}` : ''}
+            </p>
+          </div>
         </div>
+        <StatusBadge ongoing={ongoing} future={future} past={past} />
+      </div>
 
-        {/* Dates */}
-        <div style={{ display:'flex', alignItems:'center', gap:'.5rem', marginBottom:'.9rem', fontSize:'.8rem', color:'var(--color-text-muted)' }}>
-          <span>📅 {formatDateShort(trip.startDate)}</span>
-          <span style={{ opacity:.5 }}>→</span>
-          <span>{formatDateShort(trip.endDate)}</span>
-          <span style={{ marginLeft:'.25rem', padding:'.15rem .55rem', background:'var(--color-bg-input)', borderRadius:20, fontSize:'.72rem' }}>
-            {duration} nuit{duration > 1 ? 's' : ''}
+      {/* ── Bandeau dates + infos clés ── */}
+      <div style={{
+        display:'flex', flexWrap:'wrap', alignItems:'center', gap:'.4rem',
+        padding:'.6rem .85rem', marginBottom:'1rem',
+        background:'var(--color-bg-card)', border:'1px solid var(--color-border)',
+        borderRadius:12, fontSize:'.78rem', color:'var(--color-text-muted)',
+        animation:'fadeUp .35s .05s ease both',
+      }}>
+        <span>📅 {formatDateShort(trip.startDate)} → {formatDateShort(trip.endDate)}</span>
+        <span style={{ padding:'.15rem .55rem', background:'var(--color-bg-input)', borderRadius:20, fontSize:'.72rem' }}>
+          {duration} nuit{duration > 1 ? 's' : ''}
+        </span>
+        {trip.people > 1 && (
+          <span style={{ padding:'.15rem .55rem', background:'var(--color-bg-input)', borderRadius:20, fontSize:'.72rem' }}>
+            👥 {trip.people} pers.
           </span>
-          {trip.people > 1 && (
-            <span style={{ padding:'.15rem .55rem', background:'var(--color-bg-input)', borderRadius:20, fontSize:'.72rem' }}>
-              👥 {trip.people}
-            </span>
-          )}
-        </div>
-
-        {/* Compte à rebours ou progression */}
+        )}
         {countdown !== null && countdown >= 0 && (
-          <div style={{ display:'flex', alignItems:'center', gap:'.75rem', padding:'.7rem .9rem', background:'var(--color-bg-input)', borderRadius:12, marginBottom:'.9rem' }}>
-            <div style={{ textAlign:'center' }}>
-              <p style={{ fontFamily:"'Plus Jakarta Sans',sans-serif", fontSize:'2rem', fontWeight:800, color:'var(--color-primary)', margin:0, lineHeight:1 }}>{countdown}</p>
-              <p style={{ fontSize:'.65rem', textTransform:'uppercase', letterSpacing:'.06em', color:'var(--color-text-muted)', margin:0 }}>jour{countdown > 1 ? 's' : ''} avant</p>
-            </div>
-            <div style={{ flex:1, height:1, background:'var(--color-border)' }} />
-            <span style={{ fontSize:'.82rem' }}>🛫 Le départ approche !</span>
-          </div>
+          <span style={{ marginLeft:'auto', padding:'.2rem .65rem', background:'var(--color-primary)22', border:'1px solid var(--color-primary)44', borderRadius:20, fontSize:'.72rem', fontWeight:700, color:'var(--color-primary)' }}>
+            ✈️ J-{countdown}
+          </span>
         )}
-
-        {progressPct !== null && (
-          <div style={{ marginBottom:'.9rem' }}>
-            <div style={{ display:'flex', justifyContent:'space-between', marginBottom:'.35rem' }}>
-              <span style={{ fontSize:'.75rem', color:'var(--color-text-muted)' }}>Progression du voyage</span>
-              <span style={{ fontSize:'.75rem', fontWeight:700, color:'var(--color-primary)' }}>{progressPct}%</span>
-            </div>
-            <div style={{ height:6, background:'var(--color-bg-input)', borderRadius:3, overflow:'hidden' }}>
-              <div style={{ height:'100%', width:`${progressPct}%`, background:'linear-gradient(90deg, var(--color-primary), var(--color-accent))', borderRadius:3, transition:'width .6s ease' }} />
-            </div>
-          </div>
-        )}
-
-        {/* Stats rapides */}
-        <div style={{ display:'flex', gap:'.5rem' }}>
-          {trip.budget > 0 && (
-            <QuickStat icon="💶" value={`${trip.budget} €`} label="Budget prévu" />
-          )}
-          <QuickStat icon="🗓️" value={duration} label={`nuit${duration > 1 ? 's' : ''}`} />
-          {bookingCount > 0 && <QuickStat icon="🎫" value={bookingCount} label="réserv." />}
-          {checkProgress !== null && <QuickStat icon="✅" value={`${checkProgress}%`} label="checklist" />}
-        </div>
-
-        {/* Notes si renseignées */}
-        {trip.notes && (
-          <div style={{ marginTop:'.9rem', padding:'.7rem .9rem', background:'var(--color-bg-input)', borderRadius:10, fontSize:'.78rem', color:'var(--color-text-muted)', lineHeight:1.5, borderLeft:'3px solid var(--color-primary)' }}>
-            {trip.notes}
-          </div>
+        {ongoing && progressPct !== null && (
+          <span style={{ marginLeft:'auto', padding:'.2rem .65rem', background:'#4ade8022', border:'1px solid #4ade8044', borderRadius:20, fontSize:'.72rem', fontWeight:700, color:'#4ade80' }}>
+            🛫 {progressPct}% écoulé
+          </span>
         )}
       </div>
 
@@ -306,11 +244,7 @@ const TripDetail = () => {
 
       {/* ── Formulaire d'édition ── */}
       {showEdit && (
-        <TripForm
-          trip={trip}
-          onSave={() => setShowEdit(false)}
-          onCancel={() => setShowEdit(false)}
-        />
+        <TripForm trip={trip} onSave={() => setShowEdit(false)} onCancel={() => setShowEdit(false)} />
       )}
 
       {/* ── Confirmation suppression ── */}
